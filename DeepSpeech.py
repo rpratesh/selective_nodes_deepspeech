@@ -571,7 +571,7 @@ def train(server=None):
     ### TRANSFER LEARNING ###
     def init_fn(scaffold, session):
         if FLAGS.source_model_checkpoint_dir:
-	    drop_source_layers.append('layer_6')
+	    #drop_source_layers.append('layer_6')
             print('Initializing from', FLAGS.source_model_checkpoint_dir)
             ckpt = tf.train.load_checkpoint(FLAGS.source_model_checkpoint_dir)
             variables = list(ckpt.get_variable_to_shape_map().keys())
@@ -598,21 +598,13 @@ def train(server=None):
     try:
         with tf.train.MonitoredTrainingSession(master='' if server is None else server.target,
                                                is_chief=Config.is_chief,
-                                               hooks=hooks,                                                                                
+                                               hooks=hooks,
+					       scaffold=scaffold, # transfer-learning
+                                               checkpoint_dir=FLAGS.checkpoint_dir,
                                                save_checkpoint_secs=None, # already taken care of by a hook
                                                log_step_count_steps=0, # disable logging of steps/s to avoid TF warning in validation sets
                                                config=Config.session_config) as session:
             #tf.get_default_graph().finalize()
-            pdb.set_trace()
-	    mapping = {v.op.name: v for v in tf.global_variables() if not v.op.name.startswith('previous_state_') or not v.op.name.count('h6')}# or not v.op.name.count('raw_logits') or not v.op.name.count('b6')}
-            saver = tf.train.Saver(mapping)
-            checkpoint = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
-            if not checkpoint:
-            	log_error('Checkpoint directory ({}) does not contain a valid checkpoint state.'.format(FLAGS.checkpoint_dir))
-            	exit(1)
-
-            checkpoint_path = checkpoint.model_checkpoint_path
-            saver.restore(session, checkpoint_path)
             #do_export = False
             try:
                 if Config.is_chief:
