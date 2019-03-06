@@ -598,8 +598,7 @@ def train(server=None):
     try:
         with tf.train.MonitoredTrainingSession(master='' if server is None else server.target,
                                                is_chief=Config.is_chief,
-                                               hooks=hooks,
-                                               scaffold=scaffold, # transfer-learning                                             
+                                               hooks=hooks,                                                                                
                                                save_checkpoint_secs=None, # already taken care of by a hook
                                                log_step_count_steps=0, # disable logging of steps/s to avoid TF warning in validation sets
                                                config=Config.session_config) as session:
