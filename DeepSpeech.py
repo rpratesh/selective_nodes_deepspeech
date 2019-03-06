@@ -580,7 +580,7 @@ def train(server=None):
 			#if not v.name.count('b6') or not v.name.count('h6') or not v.name.count('raw_logits'):
 				with open("/data/german_DS/deepspeech-german/nodes.txt","w") as nodetxtfile:
 					print('Loading', v.op.name)
-					nodetextfile.write(v.op.name)
+					nodetxtfile.write(v.op.name)
 	        			v.load(ckpt.get_tensor(v.op.name), session=session)
 
     scaffold = tf.train.Scaffold(
