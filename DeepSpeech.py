@@ -599,13 +599,21 @@ def train(server=None):
         with tf.train.MonitoredTrainingSession(master='' if server is None else server.target,
                                                is_chief=Config.is_chief,
                                                hooks=hooks,
-                                               scaffold=scaffold, # transfer-learning
-                                               checkpoint_dir=FLAGS.checkpoint_dir,
+                                               scaffold=scaffold, # transfer-learning                                             
                                                save_checkpoint_secs=None, # already taken care of by a hook
                                                log_step_count_steps=0, # disable logging of steps/s to avoid TF warning in validation sets
                                                config=Config.session_config) as session:
             #tf.get_default_graph().finalize()
             pdb.set_trace()
+	    mapping = {v.op.name: v for v in tf.global_variables() if not v.op.name.startswith('previous_state_') or not v.op.name.count('h6')}# or not v.op.name.count('raw_logits') or not v.op.name.count('b6')}
+            saver = tf.train.Saver(mapping)
+            checkpoint = tf.train.get_checkpoint_state(FLAGS.checkpoint_dir)
+            if not checkpoint:
+            	log_error('Checkpoint directory ({}) does not contain a valid checkpoint state.'.format(FLAGS.checkpoint_dir))
+            	exit(1)
+
+            checkpoint_path = checkpoint.model_checkpoint_path
+            saver.restore(session, checkpoint_path)
             #do_export = False
             try:
                 if Config.is_chief:
