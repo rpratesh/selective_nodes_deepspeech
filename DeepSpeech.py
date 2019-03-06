@@ -571,7 +571,7 @@ def train(server=None):
     ### TRANSFER LEARNING ###
     def init_fn(scaffold, session):
         if FLAGS.source_model_checkpoint_dir:
-	    #drop_source_layers.append('layer_6')
+	    drop_source_layers.append('layer_6')
             print('Initializing from', FLAGS.source_model_checkpoint_dir)
             ckpt = tf.train.load_checkpoint(FLAGS.source_model_checkpoint_dir)
             variables = list(ckpt.get_variable_to_shape_map().keys())
